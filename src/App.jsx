@@ -8,9 +8,9 @@ import './index.css';
 
 function App() {
   const [ tasks, setTasks ] = useState([
-    { id: 1, text: 'Completed task', date: new Date(), completed: false },
-    { id: 2, text: 'Editing task', date: new Date(), completed: false },
-    { id: 3, text: 'Active task', date: new Date(), completed: false },
+    // { id: 1, text: 'Completed task', date: new Date(), completed: false },
+    // { id: 2, text: 'Editing task', date: new Date(), completed: false },
+    // { id: 3, text: 'Active task', date: new Date(), completed: false },
   ]);
 
   const [filter, setFilter] = useState('All');
