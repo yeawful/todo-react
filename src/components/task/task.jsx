@@ -8,7 +8,6 @@ function Task({ task, onToggle, onDelete }) {
         <input
           className="toggle"
           type="checkbox"
-          checked={task.completed}
           onChange={() => onToggle(task.id)}
         />
 
