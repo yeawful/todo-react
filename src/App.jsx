@@ -10,8 +10,31 @@ function App() {
   const [ tasks, setTasks ] = useState([
     { id: 1, text: 'Completed task', date: new Date(), completed: false },
     { id: 2, text: 'Editing task', date: new Date(), completed: false },
-    { id: 3, text: 'Active task', date: new Date(Date.now() - 280000), completed: false },
+    { id: 3, text: 'Active task', date: new Date(), completed: false },
   ]);
+
+  const [filter, setFilter] = useState('All');
+
+  const getFilteredTasks = () => {
+    switch(filter) {
+      case 'Active':
+        return tasks.filter(task => !task.completed);
+      case 'Completed':
+        return tasks.filter(task => task.completed);
+      default:
+        return tasks;
+    }
+  };
+
+  const addTask = (text) => {
+    const newTask = {
+      id: Date.now(),
+      text,
+      date: new Date(),
+      completed: false
+    };
+    setTasks([...tasks, newTask]);
+  };
 
   const toggleTask = (id) => {
     setTasks(tasks.map(task => 
@@ -23,16 +46,35 @@ function App() {
     setTasks(tasks.filter(task => task.id !== id));
   };
 
+  const clearCompleted = () => {
+    setTasks(tasks.filter(task => !task.completed));
+  };
+
+  const handleFilterChange = (newFilter) => {
+    setFilter(newFilter);
+  };
+
+  const filteredTasks = getFilteredTasks();
+
   return (
     <section className="todoapp">
       <header className="header">
         <h1>todos</h1>
-        <NewTaskForm/>
+        <NewTaskForm onAdd={addTask}/>
       </header>
 
       <section className="main">
-        <TaskList tasks={tasks} onToggle={toggleTask} onDelete={deleteTask}/>
-        <Footer/>
+      <TaskList 
+          tasks={filteredTasks} 
+          onToggle={toggleTask} 
+          onDelete={deleteTask}
+        />
+        <Footer
+          tasks={tasks}
+          currentFilter={filter}
+          onFilterChange={handleFilterChange}
+          onClearCompleted={clearCompleted}
+        />
       </section>
     </section>
   );
