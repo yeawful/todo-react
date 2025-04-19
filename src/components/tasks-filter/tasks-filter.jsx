@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import './tasks-filter.css';
 
 function TaskFilter({ currentFilter, onFilterChange }) {
@@ -26,5 +27,14 @@ function TaskFilter({ currentFilter, onFilterChange }) {
     </ul>
   )
 }
+
+TaskFilter.propTypes = {
+  currentFilter: PropTypes.oneOf(['All', 'Active', 'Completed']).isRequired,
+  onFilterChange: PropTypes.func.isRequired,
+};
+
+TaskFilter.defaultProps = {
+  currentFilter: 'All',
+};
 
 export default TaskFilter;

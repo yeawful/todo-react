@@ -56,6 +56,12 @@ function App() {
 
   const filteredTasks = getFilteredTasks();
 
+  const updateTask = (id, newText) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, text: newText } : task
+    ));
+  };
+
   return (
     <section className="todoapp">
       <header className="header">
@@ -68,6 +74,7 @@ function App() {
           tasks={filteredTasks} 
           onToggle={toggleTask} 
           onDelete={deleteTask}
+          onUpdate={updateTask}
         />
         <Footer
           tasks={tasks}
