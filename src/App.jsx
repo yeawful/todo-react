@@ -1,4 +1,4 @@
-import { Component, useState } from 'react';
+import { useState } from 'react';
 
 import NewTaskForm from './components/new-task-form/new-task-form'
 import TaskList from './components/task-list/task-list'
