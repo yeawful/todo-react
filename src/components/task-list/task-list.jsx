@@ -8,20 +8,17 @@ function TaskList({ tasks, onToggle, onDelete, onUpdate}) {
     return null;
   }
 
-  const taskData = tasks.map((task) => (
-    <li key={task.id}>
-      <Task 
-        task={task} 
-        onToggle={onToggle} 
-        onDelete={onDelete} 
-        onUpdate={onUpdate}
-        />
-    </li>
-  ));
-
   return (
     <ul className="todo-list">
-      {taskData}
+      {tasks.map((task) => (
+        <Task 
+          key={task.id}
+          task={task} 
+          onToggle={onToggle} 
+          onDelete={onDelete} 
+          onUpdate={onUpdate}
+        />
+      ))}
     </ul>
   );
 }
