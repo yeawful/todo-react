@@ -67,22 +67,25 @@
 .todo-list li label {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 15px 85px 15px 60px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.todo-list li label .description {
+  word-break: break-all;
+  line-height: 1.2;
+  transition: color 0.4s;
+  font-weight: 400;
+  color: #4d4d4d;
+  flex-grow: 1;
+  margin-right: 10px;
 }
 
 .todo-list li label .created {
   font-size: 13px;
   color: gray;
-}
-
-.todo-list li label .description {
-  word-break: break-all;
-  display: block;
-  line-height: 1.2;
-  transition: color 0.4s;
-  font-weight: 400;
-  color: #4d4d4d;
+  white-space: nowrap;
 }
 
 .todo-list li.completed label .description {
@@ -93,12 +96,12 @@
 .todo-list li .icon {
   position: absolute;
   top: 0;
-  bottom: -3px;
+  bottom: 0;
   width: 30px;
   height: 40px;
   font-size: 34px;
   color: #cc9a9a;
-  margin: auto 0 11px;
+  margin: auto 0;
   transition: color 0.2s ease-out;
   cursor: pointer;
 }
@@ -132,6 +135,67 @@
   margin-bottom: -1px;
 }
 
+.todo-list li .icon-pause,
+.todo-list li .icon-play {
+  font-size: 18px;
+  width: 0px;
+}
+
+.todo-list li .icon-play {
+  font-size: 15px;
+  width: 0px;
+  height: 15px;
+}
+
+.icon-pause:after {
+  content: '⏸';
+}
+
+.icon-play:after {
+  content: '▶';
+}
+
+.timer {
+  display: flex;
+  align-items: space-between;
+  font-size: 13px;
+  color: gray;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.time {
+  min-width: 0px;
+  text-align: center;
+  margin-left: 15px;
+}
+
+.icon {
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.icon-play, .icon-pause {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0; 
+  padding: 0; 
+  line-height: 1;
+}
+
+.icon-play:hover, .icon-pause:hover {
+  color: #4d4d4d;
+}
+
+.icon-play, .icon-pause, .time {
+  box-sizing: border-box;
+}
 /*
 	Hack to remove background from Mobile Safari.
 	Can't use it globally since it destroys checkboxes in Firefox

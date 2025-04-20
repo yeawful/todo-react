@@ -3,7 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 import './task.css';
 
-function Task({ task, onToggle, onDelete, onUpdate }) {
+function Task({ task, onToggle, onDelete, onUpdate, onStartTimer, onPauseTimer }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(task.text);
 
@@ -25,6 +25,21 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
     if (e.key === 'Escape') {
       setEditText(task.text);
       setIsEditing(false);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+  };
+
+  const handlePlayPause = (e) => {
+    e.stopPropagation();
+    if (task.timer.isRunning) {
+      onPauseTimer(task.id);
+    } else {
+      onStartTimer(task.id);
     }
   };
 
@@ -58,8 +73,15 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
 
         <label>
           <span className="description">{task.text}</span>
-          <span className="created">
-            created {formatDistanceToNow(task.date, { addSuffix: true, includeSeconds: true })}
+          <section className="timer">
+            <button 
+              type="button" 
+              className={`icon ${task.timer.isRunning ? 'icon-pause' : 'icon-play'}`}
+              onClick={handlePlayPause}
+            />
+            <span className="time">{formatTime(task.timer.seconds)}</span>
+          </section>
+          <span className="created">created {formatDistanceToNow(task.date, { addSuffix: true, includeSeconds: true })}
           </span>
         </label>
 
@@ -92,6 +114,8 @@ Task.propTypes = {
   onToggle: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
+  onStartTimer: PropTypes.func.isRequired,
+  onPauseTimer: PropTypes.func.isRequired,
 };
 
 export default Task;

@@ -15,7 +15,7 @@ function NewTaskForm({ onAdd }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="new-todo-form"onSubmit={handleSubmit}>
       <input
         type="text"
         className="new-todo"
