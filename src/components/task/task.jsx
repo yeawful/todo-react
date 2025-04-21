@@ -32,6 +32,13 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
     }
   };
 
+  // Таймер
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
 
   // Рендер редактирования
   if (isEditing) {
@@ -67,9 +74,19 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
         <label className="task-label">
           <span className="description">{task.text}</span>
           <div className="timer-controls">
-            <button type="button" className="icon icon-play" />
-            <button type="button" className="icon icon-pause" />
-            <span className="time">00:00</span>
+            <button 
+              type="button" 
+              className="icon icon-play" 
+              onClick={() => onToggleTimer(task.id, true)}
+            />
+            <button 
+              type="button" 
+              className="icon icon-pause" 
+              onClick={() => onToggleTimer(task.id, false)}
+            />
+            <span className="time">
+              {task.secTimer !== undefined ? formatTime(task.secTimer) : '00:00'}
+            </span>
           </div>
           <span className="created">
             created {formatDistanceToNow(task.date, { addSuffix: true, includeSeconds: true })}
@@ -96,11 +113,13 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
 }
 
 Task.propTypes = {
+  onToggleTimer: PropTypes.func.isRequired,
   task: PropTypes.shape({
     id: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
     date: PropTypes.instanceOf(Date).isRequired,
     completed: PropTypes.bool.isRequired,
+    secTimer: PropTypes.number.isRequired,
   }).isRequired,
   onToggle: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,

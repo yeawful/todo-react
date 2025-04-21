@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import './task-list.css';
 
-function TaskList({ tasks, onToggle, onDelete, onUpdate}) {
+function TaskList({ tasks, onToggle, onDelete, onUpdate, onToggleTimer }) {
 
   // Проверка на пустой список задач
   if (tasks.length === 0) {
@@ -21,6 +21,7 @@ function TaskList({ tasks, onToggle, onDelete, onUpdate}) {
           onToggle={onToggle} 
           onDelete={onDelete} 
           onUpdate={onUpdate}
+          onToggleTimer={onToggleTimer}
         />
       ))}
     </ul>
@@ -39,6 +40,7 @@ TaskList.propTypes = {
   onToggle: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
+  onToggleTimer: PropTypes.func.isRequired,
 };
 
 TaskList.defaultProps = {

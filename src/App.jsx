@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import NewTaskForm from './components/new-task-form/new-task-form'
 import TaskList from './components/task-list/task-list'
@@ -14,12 +14,14 @@ function App() {
 
 
   // Функции для работы с задачами
-  const addTask = (text) => {
+  const addTask = (text, min = 0, sec = 0) => {
     const newTask = {
       id: Date.now(),
       text,
       date: new Date(),
-      completed: false
+      completed: false,
+      secTimer: Math.max(0, (Number(min) * 60 + Math.max(0, Number(sec)))) || 0,
+      timerRunning: false,
     };
     setTasks([...tasks, newTask]);
   };
@@ -43,6 +45,29 @@ function App() {
   const clearCompleted = () => {
     setTasks(tasks.filter(task => !task.completed));
   };
+
+  
+  //Таймер
+  const toggleTimer = (id, isRunning) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, timerRunning: isRunning } : task
+    ));
+  };
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTasks(prevTasks => 
+        prevTasks.map(task => {
+          if (task.timerRunning && task.secTimer > 0) {
+            return { ...task, secTimer: task.secTimer - 1 };
+          }
+          return task;
+        })
+      );
+    }, 1000);
+  
+    return () => clearInterval(timer);
+  }, []);
 
 
   // Функции для фильтрации
@@ -75,6 +100,7 @@ function App() {
           onToggle={toggleTask} 
           onDelete={deleteTask}
           onUpdate={updateTask}
+          onToggleTimer={toggleTimer}
         />
         <Footer
           tasks={tasks}
