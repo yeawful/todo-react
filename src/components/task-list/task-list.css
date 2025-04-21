@@ -33,28 +33,19 @@
 .todo-list li .toggle {
   text-align: center;
   width: 40px;
-  /* auto, since non-WebKit browsers doesn't support input styling */
   height: auto;
   position: absolute;
   top: 0;
   bottom: 0;
   margin: auto 0;
   border: none;
-  /* Mobile Safari */
   -webkit-appearance: none;
   appearance: none;
   cursor: pointer;
-}
-
-.todo-list li .toggle {
   opacity: 0;
 }
 
 .todo-list li .toggle + label {
-  /*
-		Firefox requires `#` to be escaped - https://bugzilla.mozilla.org/show_bug.cgi?id=922433
-		IE and Edge requires *everything* to be escaped to render, so we do that instead of just the `#` - https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/7157459/
-	*/
   background-image: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E');
   background-repeat: no-repeat;
   background-position: center left;
@@ -73,13 +64,11 @@
 }
 
 .todo-list li label .description {
+  flex-grow: 1;
+  margin-right: 15px;
   word-break: break-all;
   line-height: 1.2;
-  transition: color 0.4s;
-  font-weight: 400;
   color: #4d4d4d;
-  flex-grow: 1;
-  margin-right: 10px;
 }
 
 .todo-list li label .created {
@@ -135,29 +124,9 @@
   margin-bottom: -1px;
 }
 
-.todo-list li .icon-pause,
-.todo-list li .icon-play {
-  font-size: 18px;
-  width: 0px;
-}
-
-.todo-list li .icon-play {
-  font-size: 15px;
-  width: 0px;
-  height: 15px;
-}
-
-.icon-pause:after {
-  content: '⏸';
-}
-
-.icon-play:after {
-  content: '▶';
-}
-
 .timer {
   display: flex;
-  align-items: space-between;
+  align-items: center;
   font-size: 13px;
   color: gray;
   margin-right: 10px;
@@ -165,41 +134,68 @@
 }
 
 .time {
-  min-width: 0px;
-  text-align: center;
-  margin-left: 15px;
+  font-size: 13px;
+  color: gray;
+  min-width: 45px;
+  white-space: nowrap;
+  margin-left: 30px;
+}
+
+.task-label {
+  display: flex;
+  align-items: center;
+  padding: 15px 85px 15px 60px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: 10px;
+  gap: 8px;
 }
 
 .icon {
-  margin: 0;
-  padding: 0;
-  line-height: 1;
-}
-
-.icon-play, .icon-pause {
-  width: 20px;
-  height: 20px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
   cursor: pointer;
-  flex-shrink: 0;
-  margin: 0; 
-  padding: 0; 
-  line-height: 1;
+  color: gray;
+  transition: color 0.2s ease-out;
 }
 
-.icon-play:hover, .icon-pause:hover {
+.icon-play, 
+.icon-pause {
+  font-size: 12px;
+  width: 20px;
+  height: 20px;
+}
+
+.icon-play:hover, 
+.icon-pause:hover {
   color: #4d4d4d;
 }
 
-.icon-play, .icon-pause, .time {
-  box-sizing: border-box;
+.icon-pause:after {
+  content: '⏸';
+  font-size: 18px;
+  margin-left: 10px;
+  margin-bottom: 5px;
 }
-/*
-	Hack to remove background from Mobile Safari.
-	Can't use it globally since it destroys checkboxes in Firefox
-*/
+
+.icon-play:after {
+  content: '▶';
+  font-size: 16px;
+  margin-right: 26px;
+  margin-bottom: 4px;
+}
+
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   .toggle-all,
   .todo-list li .toggle {

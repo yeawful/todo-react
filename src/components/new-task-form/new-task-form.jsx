@@ -24,7 +24,7 @@ function NewTaskForm({ onAdd }) {
 
   // Рендер
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="new-todo-form" onSubmit={handleSubmit}>
       <input
         type="text"
         className="new-todo"
@@ -32,6 +32,16 @@ function NewTaskForm({ onAdd }) {
         value={text}
         onChange={handleChange}
         autoFocus
+      />
+      <input
+        className="new-todo-form__timer"
+        placeholder="Min"
+        type="number"
+      />
+      <input
+        className="new-todo-form__timer"
+        placeholder="Sec"
+        type="number"
       />
     </form>
   );

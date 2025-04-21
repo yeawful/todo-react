@@ -64,8 +64,13 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
           onChange={() => onToggle(task.id)}
         />
 
-        <label>
+        <label className="task-label">
           <span className="description">{task.text}</span>
+          <div className="timer-controls">
+            <button type="button" className="icon icon-play" />
+            <button type="button" className="icon icon-pause" />
+            <span className="time">00:00</span>
+          </div>
           <span className="created">
             created {formatDistanceToNow(task.date, { addSuffix: true, includeSeconds: true })}
           </span>
