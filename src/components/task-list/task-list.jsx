@@ -4,10 +4,14 @@ import PropTypes from 'prop-types';
 import './task-list.css';
 
 function TaskList({ tasks, onToggle, onDelete, onUpdate}) {
+
+  // Проверка на пустой список задач
   if (tasks.length === 0) {
     return null;
   }
 
+
+  // Рендер
   return (
     <ul className="todo-list">
       {tasks.map((task) => (

@@ -7,14 +7,45 @@ import Footer from './components/footer/footer';
 import './index.css';
 
 function App() {
-  const [ tasks, setTasks ] = useState([
-    // { id: 1, text: 'Completed task', date: new Date(), completed: false },
-    // { id: 2, text: 'Editing task', date: new Date(), completed: false },
-    // { id: 3, text: 'Active task', date: new Date(), completed: false },
-  ]);
-
+  
+  // Состояние
+  const [tasks, setTasks ] = useState([]);
   const [filter, setFilter] = useState('All');
 
+
+  // Функции для работы с задачами
+  const addTask = (text) => {
+    const newTask = {
+      id: Date.now(),
+      text,
+      date: new Date(),
+      completed: false
+    };
+    setTasks([...tasks, newTask]);
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  const toggleTask = (id) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
+
+  const updateTask = (id, newText) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, text: newText } : task
+    ));
+  };
+
+  const clearCompleted = () => {
+    setTasks(tasks.filter(task => !task.completed));
+  };
+
+
+  // Функции для фильтрации
   const getFilteredTasks = () => {
     switch(filter) {
       case 'Active':
@@ -26,42 +57,11 @@ function App() {
     }
   };
 
-  const addTask = (text) => {
-    const newTask = {
-      id: Date.now(),
-      text,
-      date: new Date(),
-      completed: false
-    };
-    setTasks([...tasks, newTask]);
-  };
-
-  const toggleTask = (id) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
-  };
-
-  const deleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
-  };
-
-  const clearCompleted = () => {
-    setTasks(tasks.filter(task => !task.completed));
-  };
-
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
   };
 
-  const filteredTasks = getFilteredTasks();
-
-  const updateTask = (id, newText) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, text: newText } : task
-    ));
-  };
-
+  // Рендер
   return (
     <section className="todoapp">
       <header className="header">
@@ -71,7 +71,7 @@ function App() {
 
       <section className="main">
       <TaskList 
-          tasks={filteredTasks} 
+          tasks={getFilteredTasks()} 
           onToggle={toggleTask} 
           onDelete={deleteTask}
           onUpdate={updateTask}

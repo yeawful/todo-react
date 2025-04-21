@@ -4,9 +4,13 @@ import PropTypes from 'prop-types';
 import './task.css';
 
 function Task({ task, onToggle, onDelete, onUpdate }) {
+  
+  // Состояние
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(task.text);
 
+
+  // Обработчики событий
   const handleEdit = (e) => {
     e.stopPropagation();
     setIsEditing(true);
@@ -28,6 +32,8 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
     }
   };
 
+
+  // Рендер редактирования
   if (isEditing) {
     return (
       <li className="editing">
@@ -46,6 +52,8 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
     );
   }
 
+
+  // Рендер 
   return (
     <li className={task.completed ? 'completed' : ''}>
       <div className="view">
