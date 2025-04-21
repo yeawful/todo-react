@@ -1,40 +1,36 @@
 import PropTypes from 'prop-types';
 import './tasks-filter.css';
 
-function TaskFilter({ currentFilter, onFilterChange }) {
-  const filters = [
-    { name: 'All', label: 'All' },
-    { name: 'Active', label: 'Active' },
-    { name: 'Completed', label: 'Completed' }
-  ];
 
+// Все фильтры
+const filters = ['All', 'Active', 'Completed'];
+
+function TaskFilter({ currentFilter, onFilterChange }) {
+  // Рендер
   return (
     <ul className="filters">
-      {filters.map((filterItem) => {
-        const { name, label } = filterItem;
-        const buttonClass = currentFilter === name ? 'selected' : '';
-    
-        return (
-          <li key={name}>
-            <button
-              className={buttonClass}
-              onClick={() => onFilterChange(name)}>
-              {label}
-            </button>
-         </li>
-        );
-      })}
+      {filters.map((filter) => (
+        <li key={filter}>
+          <button
+            type="button"
+            className={currentFilter === filter ? 'selected' : ''}
+            onClick={() => onFilterChange(filter)}>
+            {filter}
+          </button>
+        </li>
+      ))}
     </ul>
-  )
+  );
 }
 
 TaskFilter.propTypes = {
-  currentFilter: PropTypes.oneOf(['All', 'Active', 'Completed']).isRequired,
-  onFilterChange: PropTypes.func.isRequired,
+  currentFilter: PropTypes.oneOf(['All', 'Active', 'Completed']),
+  onFilterChange: PropTypes.func,
 };
 
 TaskFilter.defaultProps = {
   currentFilter: 'All',
+  onFilterChange: undefined,
 };
 
 export default TaskFilter;

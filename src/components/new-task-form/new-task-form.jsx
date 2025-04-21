@@ -4,8 +4,11 @@ import PropTypes from 'prop-types';
 import './new-task-form.css';
 
 function NewTaskForm({ onAdd }) {
+  // Состояние
   const [ text, setText ] = useState('');
 
+
+  // Обработчики отправки формы и изменения поля ввода 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (text.trim()) {
@@ -14,14 +17,21 @@ function NewTaskForm({ onAdd }) {
     }
   };
 
+  const handleChange = (e) => {
+    setText(e.target.value);
+  };
+
+
+  // Рендер
   return (
-    <form className="new-todo-form"onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <input
         type="text"
         className="new-todo"
         placeholder="What needs to be done?"
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={handleChange}
+        autoFocus
       />
     </form>
   );

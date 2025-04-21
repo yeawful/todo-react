@@ -3,11 +3,15 @@ import PropTypes from 'prop-types';
 
 import './task-list.css';
 
-function TaskList({ tasks, onToggle, onDelete, onUpdate, onStartTimer, onPauseTimer, onResetTimer}) {
+function TaskList({ tasks, onToggle, onDelete, onUpdate}) {
+
+  // Проверка на пустой список задач
   if (tasks.length === 0) {
     return null;
   }
 
+
+  // Рендер
   return (
     <ul className="todo-list">
       {tasks.map((task) => (
@@ -17,9 +21,6 @@ function TaskList({ tasks, onToggle, onDelete, onUpdate, onStartTimer, onPauseTi
           onToggle={onToggle} 
           onDelete={onDelete} 
           onUpdate={onUpdate}
-          onStartTimer={onStartTimer}
-          onPauseTimer={onPauseTimer}
-          onResetTimer={onResetTimer}
         />
       ))}
     </ul>
@@ -38,9 +39,10 @@ TaskList.propTypes = {
   onToggle: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
-  onStartTimer: PropTypes.func.isRequired,
-  onPauseTimer: PropTypes.func.isRequired,
-  onResetTimer: PropTypes.func.isRequired,
+};
+
+TaskList.defaultProps = {
+  tasks: [],
 };
 
 export default TaskList;

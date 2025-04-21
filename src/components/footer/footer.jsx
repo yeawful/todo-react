@@ -1,4 +1,4 @@
-import TaskFilter from '../tasks-filter/tasks-filter'
+import TaskFilter from '../tasks-filter/tasks-filter';
 import PropTypes from 'prop-types';
 import './footer.css';
 
