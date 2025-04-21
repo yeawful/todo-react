@@ -49,7 +49,7 @@ function App() {
   
   //Таймер
   const toggleTimer = (id, isRunning) => {
-    setTasks(tasks.map(task => 
+    setTasks(prevTasks => prevTasks.map(task => 
       task.id === id ? { ...task, timerRunning: isRunning } : task
     ));
   };
@@ -60,6 +60,9 @@ function App() {
         prevTasks.map(task => {
           if (task.timerRunning && task.secTimer > 0) {
             return { ...task, secTimer: task.secTimer - 1 };
+          }
+          if (task.secTimer <= 0 && task.timerRunning) {
+            return { ...task, timerRunning: false };
           }
           return task;
         })

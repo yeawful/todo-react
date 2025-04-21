@@ -3,7 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 import './task.css';
 
-function Task({ task, onToggle, onDelete, onUpdate }) {
+function Task({ task, onToggle, onDelete, onUpdate, onToggleTimer }) {
   
   // Состояние
   const [isEditing, setIsEditing] = useState(false);
@@ -34,9 +34,10 @@ function Task({ task, onToggle, onDelete, onUpdate }) {
 
   // Таймер
   const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const secs = Number(seconds) || 0;
+    const mins = Math.floor(secs / 60);
+    const remainingSecs = secs % 60;
+    return `${mins.toString().padStart(2, '0')}:${remainingSecs.toString().padStart(2, '0')}`;
   };
 
 
