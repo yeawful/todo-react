@@ -114,6 +114,7 @@
 
 .todo-list li .icon-edit:after {
   content: '✎';
+  margin-bottom: 6px;
 }
 
 .todo-list li .edit {
