@@ -1,17 +1,55 @@
-import { useState, useEffect } from 'react';
-
-import NewTaskForm from './components/new-task-form/new-task-form'
-import TaskList from './components/task-list/task-list'
+import { useState, useEffect, useRef } from 'react';
+import NewTaskForm from './components/new-task-form/new-task-form';
+import TaskList from './components/task-list/task-list';
 import Footer from './components/footer/footer';
-
 import './index.css';
 
+// Ключ для localStorage
+const localStorageKey = 'todoAppTasks';
+
 function App() {
-  
+
   // Состояние
-  const [tasks, setTasks ] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem(localStorageKey);
+    return savedTasks ? JSON.parse(savedTasks).map(task => ({
+      ...task,
+      date: new Date(task.date),
+    })) : [];
+  });
+  
   const [filter, setFilter] = useState('All');
 
+  const lastUpdateTime = useRef(Date.now());
+  const timerRef = useRef(null);
+
+  
+  // LocalStorage
+  useEffect(() => {
+    // Подготовка данных для сохранения
+    const tasksToSave = tasks.map(task => ({
+      ...task,
+      date: task.date.toISOString(),
+    }));
+    localStorage.setItem(localStorageKey, JSON.stringify(tasksToSave));
+  }, [tasks]);
+
+
+  useEffect(() => {
+    // Обработчик события storage
+    const handleStorageChange = (e) => {
+      if (e.key === localStorageKey) {
+        const newTasks = JSON.parse(e.newValue || '[]').map(task => ({
+          ...task,
+          date: new Date(task.date),
+        }));
+        setTasks(newTasks);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Функции для работы с задачами
   const addTask = (text, min = 0, sec = 0) => {
@@ -46,30 +84,68 @@ function App() {
     setTasks(tasks.filter(task => !task.completed));
   };
 
-  
-  //Таймер
+  // Таймер
   const toggleTimer = (id, isRunning) => {
-    setTasks(prevTasks => prevTasks.map(task => 
-      task.id === id ? { ...task, timerRunning: isRunning } : task
-    ));
+    setTasks(prevTasks => {
+      const updatedTasks = prevTasks.map(task => {
+        if (isRunning && task.id !== id && task.timerRunning) {
+          return { ...task, timerRunning: false };
+        }
+        return task.id === id ? { ...task, timerRunning: isRunning } : task;
+      });
+      
+      if (isRunning) {
+        const tasksToSave = updatedTasks.map(task => ({
+          ...task,
+          date: task.date.toISOString(),
+        }));
+        localStorage.setItem(localStorageKey, JSON.stringify(tasksToSave));
+      }
+      
+      return updatedTasks;
+    });
   };
   
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTasks(prevTasks => 
-        prevTasks.map(task => {
-          if (task.timerRunning && task.secTimer > 0) {
-            return { ...task, secTimer: task.secTimer - 1 };
-          }
-          if (task.secTimer <= 0 && task.timerRunning) {
-            return { ...task, timerRunning: false };
-          }
-          return task;
-        })
-      );
-    }, 1000);
+    let animationFrameId;
+    let lastCalledTime;
   
-    return () => clearInterval(timer);
+    const updateTimer = (timestamp) => {
+      if (!lastCalledTime) {
+        lastCalledTime = timestamp;
+      }
+      
+      const elapsed = timestamp - lastCalledTime;
+      
+      if (elapsed >= 1000) {
+        lastCalledTime = timestamp;
+        
+        setTasks(prevTasks => {
+          const hasActiveTimers = prevTasks.some(task => task.timerRunning && task.secTimer > 0);
+          if (!hasActiveTimers) return prevTasks;
+  
+          return prevTasks.map(task => {
+            if (task.timerRunning && task.secTimer > 0) {
+              const newSecTimer = task.secTimer - 1;
+              return {
+                ...task,
+                secTimer: newSecTimer,
+                timerRunning: newSecTimer > 0
+              };
+            }
+            return task;
+          });
+        });
+      }
+      
+      animationFrameId = requestAnimationFrame(updateTimer);
+    };
+  
+    animationFrameId = requestAnimationFrame(updateTimer);
+  
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
 
@@ -89,6 +165,7 @@ function App() {
     setFilter(newFilter);
   };
 
+  
   // Рендер
   return (
     <section className="todoapp">
@@ -98,7 +175,7 @@ function App() {
       </header>
 
       <section className="main">
-      <TaskList 
+        <TaskList 
           tasks={getFilteredTasks()} 
           onToggle={toggleTask} 
           onDelete={deleteTask}
