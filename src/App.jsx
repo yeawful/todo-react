@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import NewTaskForm from './components/new-task-form/new-task-form';
 import TaskList from './components/task-list/task-list';
 import Footer from './components/footer/footer';
@@ -6,6 +7,7 @@ import './index.css';
 
 // Ключ для localStorage
 const localStorageKey = 'todoAppTasks';
+const localStorageTimerKey = 'todoAppTimerStart';
 
 function App() {
 
@@ -41,8 +43,11 @@ function App() {
         }));
         setTasks(newTasks);
       }
+      if (e.key === localStorageTimerKey) {
+        setTasks(prev => [...prev]);
+      }
     };
-
+  
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
@@ -89,38 +94,33 @@ function App() {
         if (isRunning && task.id !== id && task.timerRunning) {
           return { ...task, timerRunning: false };
         }
-        return task.id === id ? { ...task, timerRunning: isRunning } : task;
+        if (task.id === id) {
+          if (isRunning) {
+            localStorage.setItem(localStorageTimerKey, JSON.stringify({
+              id,
+              startTime: Date.now(),
+              initialSeconds: task.secTimer
+            }));
+          } else {
+            localStorage.removeItem(localStorageTimerKey);
+          }
+          return { 
+            ...task, 
+            timerRunning: isRunning,
+            lastUpdate: Date.now() // Добавляем метку времени
+          };
+        }
+        return task;
       });
       
-      if (isRunning) {
-        const tasksToSave = updatedTasks.map(task => ({
-          ...task,
-          date: task.date.toISOString(),
-        }));
-        localStorage.setItem(localStorageKey, JSON.stringify(tasksToSave));
-      }
+      localStorage.setItem(localStorageKey, JSON.stringify(updatedTasks.map(t => ({
+        ...t,
+        date: t.date.toISOString()
+      }))));
       
       return updatedTasks;
     });
   };
-  
-  
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setTasks(prevTasks => prevTasks.map(task => 
-        task.timerRunning && task.secTimer > 0
-          ? { 
-              ...task, 
-              secTimer: task.secTimer - 1,
-              timerRunning: task.secTimer > 1
-            }
-          : task
-      ));
-    }, 1000);
-  
-    return () => clearInterval(intervalId);
-  }, []);
-
 
   // Функции для фильтрации
   const getFilteredTasks = () => {

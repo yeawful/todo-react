@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import React from 'react';
 import PropTypes from 'prop-types';
 import './task.css';
 
@@ -8,6 +9,35 @@ function Task({ task, onToggle, onDelete, onUpdate, onToggleTimer }) {
   // Состояние
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(task.text);
+  const [displayTime, setDisplayTime] = useState(task.secTimer);
+
+  // Эффект для таймера
+  useEffect(() => {
+    if (!task.timerRunning) {
+      setDisplayTime(task.secTimer);
+      return;
+    }
+
+    const timerStr = localStorage.getItem('todoAppTimerStart');
+    if (!timerStr) return;
+
+    const timerData = JSON.parse(timerStr);
+    if (timerData.id !== task.id) return;
+
+    const intervalId = setInterval(() => {
+      const now = Date.now();
+      const elapsedSeconds = Math.floor((now - timerData.startTime) / 1000);
+      const remainingSeconds = Math.max(0, timerData.initialSeconds - elapsedSeconds);
+      
+      setDisplayTime(remainingSeconds);
+      
+      if (remainingSeconds <= 0) {
+        onToggleTimer(task.id, false);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [task.timerRunning, task.id, task.secTimer, onToggleTimer]);
 
 
   // Обработчики событий
@@ -86,7 +116,7 @@ function Task({ task, onToggle, onDelete, onUpdate, onToggleTimer }) {
               onClick={() => onToggleTimer(task.id, false)}
             />
             <span className="time">
-              {task.secTimer !== undefined ? formatTime(task.secTimer) : '00:00'}
+              {formatTime(displayTime)}
             </span>
           </div>
           <span className="created">
@@ -127,4 +157,4 @@ Task.propTypes = {
   onUpdate: PropTypes.func.isRequired,
 };
 
-export default Task;
+export default React.memo(Task);
