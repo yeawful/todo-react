@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import NewTaskForm from './components/new-task-form/new-task-form';
 import TaskList from './components/task-list/task-list';
 import Footer from './components/footer/footer';
@@ -21,7 +20,7 @@ function App() {
   });
 
   const [filter, setFilter] = useState('All');
-
+  
 
   // Автосохранение задач в localStorage
   useEffect(() => {
@@ -33,24 +32,68 @@ function App() {
   }, [tasks]);
 
 
+  // Таймер
+  const toggleTimer = useCallback((id, isRunning) => {
+    setTasks(prevTasks => prevTasks.map(task => {
+      if (task.id !== id) return task;
+  
+      if (!isRunning) {
+        const timerDataJson = localStorage.getItem(localStorageTimerKey);
+        const timerData = timerDataJson && JSON.parse(timerDataJson);
+        
+        if (timerData?.id === id) {
+          const elapsed = Math.floor((Date.now() - timerData.startTime) / 1000);
+          localStorage.removeItem(localStorageTimerKey);
+          return {
+            ...task,
+            timerRunning: false,
+            secTimer: Math.max(0, timerData.initialSeconds - elapsed)
+          };
+        }
+      } else {
+        localStorage.setItem(localStorageTimerKey, JSON.stringify({
+          id,
+          startTime: Date.now(),
+          initialSeconds: task.secTimer
+        }));
+      }
+  
+      return { ...task, timerRunning: isRunning };
+    }));
+  }, []);
+
+
   // Синхронизация между вкладками
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === localStorageKey) {
-        const newTasks = JSON.parse(e.newValue || '[]').map(task => ({
-          ...task,
-          date: new Date(task.date),
-        }));
-        setTasks(newTasks);
+        try {
+          const newTasks = JSON.parse(e.newValue || '[]').map(task => ({
+            ...task,
+            date: new Date(task.date)
+          }));
+          setTasks(newTasks);
+        } catch {
+          setTasks([]);
+        }
+        return;
       }
+
+      // Обработка изменений таймера (упрощенная версия)
       if (e.key === localStorageTimerKey) {
-        setTasks(prev => [...prev]);
+        const timerData = e.newValue ? JSON.parse(e.newValue) : null;
+        if (!timerData) return;
+        
+        setTasks(prev => prev.map(task => ({
+          ...task,
+          timerRunning: task.id === timerData.id
+        })));
       }
     };
-  
+
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, []); // Пустой массив зависимостей - эффект запускается только при монтировании
 
 
   // Функции для работы с задачами
@@ -86,41 +129,6 @@ function App() {
     setTasks(tasks.filter(task => !task.completed));
   };
 
-
-  // Таймер
-  const toggleTimer = (id, isRunning) => {
-    setTasks(prevTasks => {
-      const updatedTasks = prevTasks.map(task => {
-        if (isRunning && task.id !== id && task.timerRunning) {
-          return { ...task, timerRunning: false };
-        }
-        if (task.id === id) {
-          if (isRunning) {
-            localStorage.setItem(localStorageTimerKey, JSON.stringify({
-              id,
-              startTime: Date.now(),
-              initialSeconds: task.secTimer
-            }));
-          } else {
-            localStorage.removeItem(localStorageTimerKey);
-          }
-          return { 
-            ...task, 
-            timerRunning: isRunning,
-            lastUpdate: Date.now() // Добавляем метку времени
-          };
-        }
-        return task;
-      });
-      
-      localStorage.setItem(localStorageKey, JSON.stringify(updatedTasks.map(t => ({
-        ...t,
-        date: t.date.toISOString()
-      }))));
-      
-      return updatedTasks;
-    });
-  };
 
   // Функции для фильтрации
   const getFilteredTasks = () => {
@@ -167,3 +175,4 @@ function App() {
 }
 
 export default App;
+
