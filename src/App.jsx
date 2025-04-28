@@ -9,7 +9,7 @@ const localStorageKey = 'todoAppTasks';
 
 function App() {
 
-  // Состояние
+  // Состояние тасков(учитывая localStorage) и фильтров
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem(localStorageKey);
     return savedTasks ? JSON.parse(savedTasks).map(task => ({
@@ -17,16 +17,12 @@ function App() {
       date: new Date(task.date),
     })) : [];
   });
-  
+
   const [filter, setFilter] = useState('All');
 
-  const lastUpdateTime = useRef(Date.now());
-  const timerRef = useRef(null);
 
-  
-  // LocalStorage
+  // Автосохранение задач в localStorage
   useEffect(() => {
-    // Подготовка данных для сохранения
     const tasksToSave = tasks.map(task => ({
       ...task,
       date: task.date.toISOString(),
@@ -35,8 +31,8 @@ function App() {
   }, [tasks]);
 
 
+  // Синхронизация между вкладками
   useEffect(() => {
-    // Обработчик события storage
     const handleStorageChange = (e) => {
       if (e.key === localStorageKey) {
         const newTasks = JSON.parse(e.newValue || '[]').map(task => ({
@@ -50,6 +46,7 @@ function App() {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
 
   // Функции для работы с задачами
   const addTask = (text, min = 0, sec = 0) => {
@@ -84,6 +81,7 @@ function App() {
     setTasks(tasks.filter(task => !task.completed));
   };
 
+
   // Таймер
   const toggleTimer = (id, isRunning) => {
     setTasks(prevTasks => {
@@ -106,46 +104,21 @@ function App() {
     });
   };
   
+  
   useEffect(() => {
-    let animationFrameId;
-    let lastCalledTime;
-  
-    const updateTimer = (timestamp) => {
-      if (!lastCalledTime) {
-        lastCalledTime = timestamp;
-      }
-      
-      const elapsed = timestamp - lastCalledTime;
-      
-      if (elapsed >= 1000) {
-        lastCalledTime = timestamp;
-        
-        setTasks(prevTasks => {
-          const hasActiveTimers = prevTasks.some(task => task.timerRunning && task.secTimer > 0);
-          if (!hasActiveTimers) return prevTasks;
-  
-          return prevTasks.map(task => {
-            if (task.timerRunning && task.secTimer > 0) {
-              const newSecTimer = task.secTimer - 1;
-              return {
-                ...task,
-                secTimer: newSecTimer,
-                timerRunning: newSecTimer > 0
-              };
+    const intervalId = setInterval(() => {
+      setTasks(prevTasks => prevTasks.map(task => 
+        task.timerRunning && task.secTimer > 0
+          ? { 
+              ...task, 
+              secTimer: task.secTimer - 1,
+              timerRunning: task.secTimer > 1
             }
-            return task;
-          });
-        });
-      }
-      
-      animationFrameId = requestAnimationFrame(updateTimer);
-    };
+          : task
+      ));
+    }, 1000);
   
-    animationFrameId = requestAnimationFrame(updateTimer);
-  
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
+    return () => clearInterval(intervalId);
   }, []);
 
 
